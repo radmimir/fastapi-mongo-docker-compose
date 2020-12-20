@@ -1,0 +1,25 @@
+version: '3.1'
+volumes:
+  mongodata:
+  pip37:
+services:
+  # Our main app
+  api:
+    build: .
+    volumes:
+      - ./code:/app
+    container_name: api
+    command: sh -c "pip install -r requirements.txt && uvicorn main:app --host 0.0.0.0 --port 8080 --reload"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongo
+  mongo:
+    image: mongo
+    restart: always
+    container_name: mongo
+    volumes:
+      - ./mongodata:/data/db
+    command: mongoimport --uri "mongodb://localhost:27017" --db employees --collection employee --type json --file /data/db/employees.json --jsonArray
+    ports:
+      - "27017:27017"

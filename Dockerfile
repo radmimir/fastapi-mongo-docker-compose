@@ -1,3 +1,5 @@
-FROM mongo
-COPY code/employees.json /employees.json
-CMD mongoimport --db employees --collection employee --type json --file /employees.json --jsonArray
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.7
+
+COPY ./code /app
+WORKDIR /app
+RUN "/usr/local/bin/python -m pip install --upgrade pip"
