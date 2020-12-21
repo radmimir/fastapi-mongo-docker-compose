@@ -3,23 +3,32 @@ volumes:
   mongodata:
   pip37:
 services:
-  # Our main app
+  mongodb:
+    image: mongo:3.2.6
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: employees
+    container_name: mongodb
+    ports:
+      - "27017:27017"
   api:
     build: .
     volumes:
-      - ./code:/app
+      - ./app:/app
     container_name: api
+    environment:
+      - MONGO_URI=mongodb://localhost:27017/
     command: sh -c "pip install -r requirements.txt && uvicorn main:app --host 0.0.0.0 --port 8080 --reload"
     ports:
       - "8080:8080"
-    depends_on:
-      - mongo
-  mongo:
-    image: mongo
-    restart: always
-    container_name: mongo
+    links:
+      - mongodb
+  mongoseed:
+    image: mongo:3.2.6
+    container_name: mongo_seed
     volumes:
-      - ./mongodata:/data/db
-    command: mongoimport --uri "mongodb://localhost:27017" --db employees --collection employee --type json --file /data/db/employees.json --jsonArray
-    ports:
-      - "27017:27017"
+    - ./mongo_seed:/mongo_seed
+    command:
+      /mongo_seed/import.sh
+    links:
+      - mongodb
