@@ -3,7 +3,7 @@ from starlette.responses import RedirectResponse
 from model.employee import Employee
 from pymongo import MongoClient
 from typing import List
-from model.database import retrieve_employees
+from model.database import retrieve_employees, retrieve_employee, employees_age_less
 import logging
 from os import environ
 
@@ -35,11 +35,21 @@ async def get_employees():
     return
 
 
-@app.get("/age_less_25", response_description="Employees with age less 25 retrieved", tags=['Age < 25'],
+@app.get("/age_less", response_description="Employees with age less retrieved", tags=['Age less'],
          response_model=List[Employee])
-async def get_age_less_25():
+async def get_age_less(age: int):
     global client
-    employees = retrieve_employees(client)  # , "{age: { $lt: 25}}")
+    employees = employees_age_less(client, age)  # , "{age: { $lt: 25}}")
+    if employees:
+        return employees
+    return []
+
+
+@app.get("/employee/{id}", response_description="Employees with id retrieved", tags=['Id'],
+         response_model=List[Employee])
+async def get_employee_by_id(id: str):
+    global client
+    employees = retrieve_employee(client, id)
     if employees:
         return employees
     return []
