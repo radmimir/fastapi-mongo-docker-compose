@@ -1,23 +1,4 @@
-import motor.motor_asyncio
-from motor.motor_asyncio import AsyncIOMotorCollection
-import logging
-
-MONGO_DETAILS = "mongodb://localhost:27017/test"
-
-collection_employees = AsyncIOMotorCollection()
-client = motor.motor_asyncio.AsyncIOMotorClient()
-
-
-def connect_to_db():
-    client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_DETAILS)
-    db_employees = client.test
-
-    collection_employees = db_employees.get_collection("employee")
-    logging.info("Connected to DB")
-
-
-# helpers
-
+from pymongo import MongoClient
 
 def employee_helper(employee) -> dict:
     return {
@@ -33,10 +14,8 @@ def employee_helper(employee) -> dict:
     }
 
 
-async def retrieve_employees():
-    employees = []
-    logging.info(collection_employees.employee)
-    async for employee in collection_employees.find():
-        employees.append(employee_helper(employee))
-        logging.info("retrieved ", employee)
-    return employees
+def retrieve_employees(client: MongoClient):
+    db_employees = client.get_database("employees")
+    collection_employees = db_employees.get_collection("employee")
+    results = list(map(employee_helper, [r for r in collection_employees.find()]))
+    return results

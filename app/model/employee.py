@@ -1,13 +1,14 @@
-import datetime
 from pydantic import BaseModel, EmailStr, Field
+from bson.objectid import ObjectId
 
 
 class Employee(BaseModel):
+    _id: hex = ObjectId()
     name: str = Field(...)
     email: EmailStr = Field(...)
     age: int = Field(...)
     company: str = Field(...)
-    join_date: datetime.date = Field(...)
+    join_date: str = Field(...)
     job_title: str = Field(...)
     gender: str = Field(...)
     salary: int = Field(...)
@@ -26,14 +27,3 @@ class Employee(BaseModel):
             }
         }
 
-
-def responseModel(data, message):
-    return {
-        "data": [data],
-        "code": 200,
-        "message": message,
-    }
-
-
-def errorResponseModel(error, code, message):
-    return {"error": error, "code": code, "message": message}

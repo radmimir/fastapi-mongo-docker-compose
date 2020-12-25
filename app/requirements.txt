@@ -1,5 +1,2 @@
-fastapi
-uvicorn
-odmantic
-motor
 pydantic[email]
+pymongo==3.11.2

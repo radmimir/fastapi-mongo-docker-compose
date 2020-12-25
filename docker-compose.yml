@@ -1,28 +1,25 @@
 version: '3.1'
 volumes:
-  mongodata:
-  pip37:
+  mongo:
 services:
-  mongodb:
+  mongo:
     image: mongo:3.2.6
     restart: always
-    environment:
-      MONGO_INITDB_DATABASE: employees
+    env_file:
+      - .env
     container_name: mongodb
-    ports:
-      - "27017:27017"
   api:
     build: .
     volumes:
       - ./app:/app
     container_name: api
     environment:
-      - MONGO_URI=mongodb://localhost:27017/
-    command: sh -c "pip install -r requirements.txt && uvicorn main:app --host 0.0.0.0 --port 8080 --reload"
+      MONGO_URI: "mongodb://mongo:27017/$MONGO_DB"
     ports:
       - "8080:8080"
+    command: uvicorn main:app --host 0.0.0.0 --port 8080 # python test.py   # uvicorn main:app --host 0.0.0.0 --port 8080'
     links:
-      - mongodb
+      - mongo
   mongoseed:
     image: mongo:3.2.6
     container_name: mongo_seed
@@ -31,4 +28,4 @@ services:
     command:
       /mongo_seed/import.sh
     links:
-      - mongodb
+      - mongo

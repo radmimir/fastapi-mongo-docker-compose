@@ -1,11 +1,11 @@
 db.createuser(
     {
-        user: "Admin",
-        pwd:  "plarin_admin",
+        user: ${MONGO_USERNAME},
+        pwd:  ${MONGO_PASSWORD},
         roles:[
             {
                 role: "readWrite",
-                db: "employees"
+                db: ${MONGO_DB}
             }
         ]
     }
